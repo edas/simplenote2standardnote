@@ -14,7 +14,11 @@ def convert(simplenote, tags, trashed: false)
   id = simplenote["id"]
   uuid = "#{id[0..7]}-#{id[8..11]}-#{id[12..15]}-#{id[16..19]}-#{id[20..31]}"
   title, content = simplenote["content"].split("\r\n", 2)
-  
+  preview = if content.strip.chars.length > 80
+    content.strip.chars[0...80].join('').strip + "…"
+  else 
+    content.strip
+  end
   simplenote["tags"].each do |tag|
     tag.strip!
     unless tag.empty?
@@ -48,6 +52,8 @@ def convert(simplenote, tags, trashed: false)
       "text" => content.strip,
       "references" => [],
       "trashed" => trashed,
+      "preview_plain" => preview,
+      "preview_html" => nil,
       "appData": {
         "org.standardnotes.sn": {
           "client_updated_at": simplenote["lastModified"]
