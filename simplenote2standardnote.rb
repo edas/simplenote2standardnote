@@ -14,6 +14,10 @@ def convert(simplenote, tags, trashed: false)
   id = simplenote["id"]
   uuid = "#{id[0..7]}-#{id[8..11]}-#{id[12..15]}-#{id[16..19]}-#{id[20..31]}"
   title, content = simplenote["content"].split("\r\n", 2)
+  if content.nil?
+    content = title
+    title = id
+  end
   preview = if content.strip.chars.length > 80
     content.strip.chars[0...80].join('').strip + "…"
   else 
@@ -71,6 +75,7 @@ trashednotes = simplenotes["trashedNotes"].map do |simplenote|
   convert(simplenote, tags, trashed: true)
 end
 
-standardnotes["items"].concat( activenotes, trashednotes, tags.values )
+# standardnotes["items"].concat( activenotes, trashednotes, tags.values )
+standardnotes["items"] = [activenotes, trashednotes, tags.values].reduce([], :concat)
 
 puts JSON.pretty_generate( standardnotes )
